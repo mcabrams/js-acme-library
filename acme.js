@@ -21,7 +21,7 @@ function jsAcme(obj) {
 }
 
 // Set addEvent based on event model available
-if (obj && obj.addEventListener) {                  // Standard Event Model (W3C)
+if (addEventListener) {                  // Standard Event Model (W3C)
   jsAcme.addEvent = function(obj, event, fn) {
     obj.addEventListener(event, fn, false);
   };
@@ -29,7 +29,7 @@ if (obj && obj.addEventListener) {                  // Standard Event Model (W3C
   jsAcme.removeEvent = function(obj, event, fn) {
     obj.removeEventListener(event, fn, false);
   };
-} else if (obj && obj.attachEvent) {                // Legacy IE (yuck)
+} else if (attachEvent) {                // Legacy IE (yuck)
     jsAcme.addEvent = function(obj, event, fn) {
       var fnHash = "acme_e_" + event + fn;          // Hopefully unique method name for handler function
 
