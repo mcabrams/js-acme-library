@@ -25,6 +25,10 @@ if (obj && obj.addEventListener) {                  // Standard Event Model (W3C
   jsAcme.addEvent = function(obj, event, fn) {
     obj.addEventListener(event, fn, false);
   };
+
+  jsAcme.removeEvent = function(obj, event, fn) {
+    obj.removeEventListener(event, fn, false);
+  };
 } else if (obj && obj.attachEvent) {                // Legacy IE (yuck)
     jsAcme.addEvent = function(obj, event, fn) {
       var handler = function() {                    // Create handler function in order to access event props (emulation)
@@ -48,17 +52,20 @@ if (obj && obj.addEventListener) {                  // Standard Event Model (W3C
             this._event.cancelBubble = true;
           }
         });
-      };
-      // end of handler function
+      }; // end of handler
 
       obj.attachEvent("on" + event, handler);
+    }; // end of addEvent
+
+    jsAcme.removeEvent = function(obj, event, fn) {
+
     };
 } else {                                            // DOM Level 0 Event fallback assignment (gross)
     jsAcme.addEvent = function(obj, event, fn) {
       obj["on" + event] = fn;
     };
+
+    jsAcme.removeEvent = function(obj, event, fn) {
+      obj["on" + event] = null;
+    };
 }
-
-jsAcme.removeEvent = function(obj, event, fn) {
-
-};
