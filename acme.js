@@ -31,7 +31,9 @@ if (obj && obj.addEventListener) {                  // Standard Event Model (W3C
   };
 } else if (obj && obj.attachEvent) {                // Legacy IE (yuck)
     jsAcme.addEvent = function(obj, event, fn) {
-      var handler = function() {                    // Create handler function in order to access event props (emulation)
+      var fnHash = "acme_e_" + event + fn;          // Hopefully unique method name for handler function
+
+      obj[fnHash] = function() {                    // Create handler method on DOM object in order to access event props (emulation)
         var type = event.type,
             relatedTarget = null;                   // Set relatedTarget to null since it's only used in mouseover/mouseout
 
@@ -54,11 +56,18 @@ if (obj && obj.addEventListener) {                  // Standard Event Model (W3C
         });
       }; // end of handler
 
-      obj.attachEvent("on" + event, handler);
+      obj.attachEvent("on" + event, obj[fnhash]);
     }; // end of addEvent
 
     jsAcme.removeEvent = function(obj, event, fn) {
-
+      var fnHash = "acme_e_" + event + fn;          // Recreate fnHash value, possible area for refactoring
+      
+      if (obj[fnHash]) {
+        obj.detachEvent("on" + event, obj[fnHash]);
+        delete obj[fnHash];                         // Delete method from object so it no longer exists
+      } else {
+        throw new Error(fnHash + " is not a function on the event object.");
+      }
     };
 } else {                                            // DOM Level 0 Event fallback assignment (gross)
     jsAcme.addEvent = function(obj, event, fn) {
@@ -69,3 +78,7 @@ if (obj && obj.addEventListener) {                  // Standard Event Model (W3C
       obj["on" + event] = null;
     };
 }
+
+jsAcme.addEvent(document, "click", function(e) {
+  alert("You just clicked the document, bro.");
+});
