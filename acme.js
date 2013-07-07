@@ -42,18 +42,20 @@ if (addEventListener) {                  // Standard Event Model (W3C)
           relatedTarget = (type === "mouseover") ? event.fromElement : event.toElement;
         }
 
-        fn({                                        // Create our own event object and pass to fn we want to execute
+        var emulatedEvent = {                       // Create emulatory event object that we can pass to our handler fn
           target: event.srcElement,
           type: type,
           relatedTarget: relatedTarget,
           _event: event,
           preventDefault: function() {
-            this._event.returnValue = false;
-          },
-          stopPropagation: function() {
-            this._event.cancelBubble = true;
-          }
-        });
+                            this._event.returnValue = false;
+                          },
+         stopPropagation: function() {
+                            this._event.cancelBubble = true;
+                          }
+        };
+
+        fn.call(obj, emulatedEvent);  // Call our actual handler function
       }; // end of handler
 
       obj.attachEvent("on" + event, obj[fnhash]);
@@ -80,5 +82,5 @@ if (addEventListener) {                  // Standard Event Model (W3C)
 }
 
 jsAcme.addEvent(document, "click", function(e) {
-  alert("You just clicked the document, bro.");
+  alert("You just clicked " + this + ", bro.");
 });
