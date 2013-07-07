@@ -11,7 +11,7 @@ function jsAcme(obj) {
 
   if (typeof obj === "string") {
     this.el = document.getElementById(obj);
-  } else if (typeof obj === "object") {
+  } else if (typeof obj === "object" && obj.nodeType && obj.nodeType === 1) { // Elements have nodeType === 1
     this.el = obj;
   } else {
     throw new Error("Argument is of incorrect type");
@@ -20,7 +20,48 @@ function jsAcme(obj) {
   this._css = this.el.style;
 }
 
-// Set addEvent based on event model available
+// Set event instance methods
+jsAcme.prototype.addEvent = function(event, fn) {
+  jsAcme.addEvent(this.el, event, fn);
+
+  return this;  // Allows us to chain methods together i.e., jsAcme("foo").addEvent(...).removeEvent(...);
+};
+
+jsAcme.prototype.removeEvent = function(event, fn) {
+  jsAcme.removeEvent(this.el, event, fn);
+
+  return this;
+};
+
+// TODO: .click, .mouseover, .mouseout are good targets for DRYing up
+jsAcme.prototype.click = function(fn) {
+  var that = this;  // Allows this to maintain context of our jsAcme object
+  jsAcme.addEvent(this.el, "click", function(e) {
+    fn.call(that, e);
+  });
+
+  return this;
+};
+
+jsAcme.prototype.mouseover = function(fn) {
+  var that = this;  // Allows this to maintain context of our jsAcme object
+  jsAcme.addEvent(this.el, "mouseover", function(e) {
+    fn.call(that, e);
+  });
+
+  return this;
+};
+
+jsAcme.prototype.mouseout = function(fn) {
+  var that = this;  // Allows this to maintain context of our jsAcme object
+  jsAcme.addEvent(this.el, "mouseout", function(e) {
+    fn.call(that, e);
+  });
+
+  return this;
+};
+
+// Set static event methods based on event model available
 if (addEventListener) {                  // Standard Event Model (W3C)
   jsAcme.addEvent = function(obj, event, fn) {
     obj.addEventListener(event, fn, false);
@@ -80,7 +121,3 @@ if (addEventListener) {                  // Standard Event Model (W3C)
       obj["on" + event] = null;
     };
 }
-
-jsAcme.addEvent(document, "click", function(e) {
-  alert("You just clicked " + this + ", bro.");
-});
