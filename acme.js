@@ -121,3 +121,5 @@ if (addEventListener) {                  // Standard Event Model (W3C)
       obj["on" + event] = null;
     };
 }
+
+console.log("hi there");
